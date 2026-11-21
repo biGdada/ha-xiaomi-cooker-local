@@ -52,6 +52,8 @@ flow — you can find it with `tools/cooker_probe.py ... info`.
 
 ### HACS (recommended)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=biGdada&repository=ha-xiaomi-cooker-local&category=integration)
+
 1. HACS → Integrations → ⋮ → Custom repositories
 2. Add `https://github.com/biGdada/ha-xiaomi-cooker-local` as **Integration**
 3. Install **Xiaomi Rice Cooker (Local miio)**
