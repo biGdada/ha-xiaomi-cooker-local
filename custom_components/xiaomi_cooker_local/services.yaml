@@ -1,0 +1,342 @@
+start:
+  name: Start cooking
+  description: Start cooking. On chunmi.cooker.normalcd1 pass a cook mode (1-4 or Fine Cook/Quick Cook/Cook Congee/Keep Warm); on classic models pass a profile title or hex string. Omit to use the selected/first option.
+  fields:
+    device_id:
+      name: Cooker device
+      description: Target cooker. Optional when only one is configured.
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    profile:
+      name: Profile
+      description: Profile title or raw hex profile string.
+      example: Jingzhu
+      selector:
+        text:
+
+stop:
+  name: Stop cooking
+  description: Stop the current cooking process (cancel_cooking on cd1, set_func end02 on classic models).
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+
+set_menu:
+  name: Set menu
+  description: Select a cooking profile on the cooker without starting it.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    profile:
+      name: Profile
+      description: Profile title or raw hex profile string.
+      selector:
+        text:
+
+set_settings:
+  name: Set cooker settings
+  description: Change setting bits (buzzer/LED/keep-warm/warnings) in one command.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    led_on:
+      name: LED on
+      selector:
+        boolean:
+    auto_keep_warm:
+      name: Auto keep warm
+      selector:
+        boolean:
+    lid_open_warning:
+      name: Lid open warning
+      selector:
+        boolean:
+    lid_open_warning_delayed:
+      name: Delayed lid open warning
+      selector:
+        boolean:
+    jingzhu_auto_keep_warm:
+      name: Jingzhu auto keep warm
+      selector:
+        boolean:
+    kuaizhu_auto_keep_warm:
+      name: Kuaizhu auto keep warm
+      selector:
+        boolean:
+    zhuzhou_auto_keep_warm:
+      name: Zhuzhou auto keep warm
+      selector:
+        boolean:
+    favorite_auto_keep_warm:
+      name: Favorite auto keep warm
+      selector:
+        boolean:
+
+set_timeouts:
+  name: Set interaction timeouts
+  description: Change LED-off and lid-open warning delays (seconds).
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    led_off:
+      name: LED off after
+      selector:
+        number:
+          min: 0
+          max: 255
+    lid_open:
+      name: Lid open after
+      selector:
+        number:
+          min: 0
+          max: 255
+    lid_open_warning:
+      name: Lid warning after
+      selector:
+        number:
+          min: 0
+          max: 255
+
+raw_command:
+  name: Send raw miIO command
+  description: Send any miIO method and parameters. Use this while mapping the protocol with the Mi Home app.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    method:
+      name: Method
+      example: get_prop
+      required: true
+      selector:
+        text:
+    parameters:
+      name: Parameters
+      description: JSON array or object passed as the method parameters.
+      default: []
+      selector:
+        object:
+
+dump:
+  name: Dump cooker state
+  description: Write a timestamped JSON dump of raw and decoded cooker state to .storage and return it as the service response.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+  response:
+    path:
+      description: Path of the written dump file.
+      example: /config/.storage/xiaomi_cooker_local_dump_abc_1700000000.json
+
+get_temperature_history:
+  name: Get temperature history
+  description: Return the decoded temperature history recorded during cooking.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+  response:
+    temperatures:
+      description: List of temperatures recorded during cooking.
+      example: "[22, 21, 21]"
+
+search_recipes:
+  name: Search recipes
+  description: Search the recipe library by name or ingredient, in Chinese or English.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    query:
+      name: Search query
+      description: Chinese or English recipe name, or an ingredient. Omit to use the Recipe search query entity.
+      example: 温泉蛋
+      selector:
+        text:
+    limit:
+      name: Maximum results
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+    favorites_only:
+      name: Favorites only
+      default: false
+      selector:
+        boolean:
+  response:
+    recipes:
+      description: Matching recipes with localized names, images and favorite flags.
+    language:
+      description: Language code used for the localized names.
+    total:
+      description: Total number of recipes in the library.
+
+get_recipe:
+  name: Get recipe details
+  description: "Return the full recipe: image, ingredients, steps, tips and cookcode."
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    recipe:
+      name: Recipe
+      description: Recipe ID or name, in Chinese or English. Omit to use the Recipe ID entity.
+      example: 温泉蛋
+      selector:
+        text:
+    language:
+      name: Language
+      description: Display language for this response (`ha` or `original`). Defaults to HA mode.
+      selector:
+        select:
+          options:
+            - ha
+            - original
+  response:
+    id:
+      description: Recipe ID.
+    name:
+      description: Localized recipe name.
+    ingredients:
+      description: Localized ingredient list with quantities.
+    steps:
+      description: Localized cooking steps.
+
+start_recipe:
+  name: Start recipe
+  description: Start a cloud recipe locally on chunmi.cooker.normalcd1 using its runnable cookcode.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    recipe:
+      name: Recipe
+      description: Recipe ID or name, in Chinese or English.
+      required: true
+      example: 温泉蛋
+      selector:
+        text:
+  response:
+    id:
+      description: Recipe ID that was started.
+    name:
+      description: Localized recipe name.
+
+translate_recipe:
+  name: Translate a recipe
+  description: Translate missing English text for one recipe using Google Translate and save it to the local translation and recipe caches so it remains in English after restart.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    recipe:
+      name: Recipe
+      description: Recipe ID or name, in Chinese or English.
+      required: true
+      selector:
+        text:
+  response:
+    id:
+      description: Recipe ID.
+    name:
+      description: Localized recipe name.
+    translated:
+      description: Number of strings translated.
+    failed:
+      description: Number of strings that could not be translated.
+    error:
+      description: First translation error, or null.
+
+add_favorite:
+  name: Save recipe to favorites
+  description: Save a recipe to the local favorites list in Home Assistant.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    recipe:
+      name: Recipe
+      description: Recipe ID or name, in Chinese or English.
+      required: true
+      selector:
+        text:
+
+remove_favorite:
+  name: Remove recipe from favorites
+  description: Remove a recipe from the local favorites list in Home Assistant.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+    recipe:
+      name: Recipe
+      description: Recipe ID or name, in Chinese or English.
+      required: true
+      selector:
+        text:
+
+list_favorites:
+  name: List favorite recipes
+  description: Return all locally saved favorite recipes.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+  response:
+    recipes:
+      description: Favorite recipes with localized names and images.
+
+refresh_recipes:
+  name: Refresh recipes
+  description: Redownload recipes from the Joyami API and fall back to the bundled catalogue on failure.
+  fields:
+    device_id:
+      name: Cooker device
+      selector:
+        device:
+          integration: xiaomi_cooker_local
+  response:
+    count:
+      description: Number of recipes available after the refresh.
+    last_refresh:
+      description: Timestamp of the successful refresh.
+    error:
+      description: Error message when the refresh failed, otherwise null.
+    translation_warning:
+      description: Message when translation was unavailable or rate-limited, otherwise null.

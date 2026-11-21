@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接小米电饭煲",
+        "description": "请输入电饭煲的 IP 地址。token 留空时会自动从使用同一 IP 的其他小米集成导入，也可以手动填写。模型留空即可自动检测。已知型号：{known_models}",
+        "data": {
+          "host": "IP 地址",
+          "token": "miIO token（可留空，自动导入）",
+          "name": "名称",
+          "model": "型号（可选，自动检测）",
+          "scan_interval": "轮询间隔（秒）",
+          "timeout": "连接超时（秒）"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接。请检查 IP、token，以及电饭煲是否与 Home Assistant 在同一网络。如果自动检测失败，请手动填写型号。",
+      "token_not_found": "未找到该 IP 对应的已保存 miIO token。请先将该设备添加到 Xiaomi Miio/Xiaomi Miot Auto，或手动填写 token。",
+      "invalid_profiles": "自定义烹饪程序 JSON 无效。"
+    },
+    "abort": {
+      "already_configured": "此电饭煲已配置。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "电饭煲选项",
+        "data": {
+          "scan_interval": "轮询间隔（秒）",
+          "timeout": "连接超时（秒）",
+          "profiles": "自定义烹饪程序（title/profile 对象 JSON 列表）",
+          "recipe_source": "食谱来源",
+          "recipe_language": "食谱语言"
+        }
+      }
+    },
+    "error": {
+      "invalid_profiles": "自定义烹饪程序 JSON 无效。"
+    }
+  },
+  "entity": {
+    "button": {
+      "refresh_recipes": {
+        "name": "刷新食谱"
+      }
+    },
+    "number": {
+      "recipe_id": {
+        "name": "食谱编号"
+      }
+    },
+    "text": {
+      "recipe_query": {
+        "name": "食谱搜索关键词"
+      }
+    },
+    "select": {
+      "recipe_language": {
+        "name": "食谱语言"
+      }
+    },
+    "sensor": {
+      "recipe_library": {
+        "name": "食谱库"
+      },
+      "recipe_translation_status": {
+        "name": "食谱翻译状态"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+.DS_Store
+
+# Local OpenCode permissions (this machine only, not shipped with the integration)
+opencode.jsonc
+
+# Local protocol-capture artifacts (device-specific)
+map.jsonl
+cooker_dump_*.json
+capture/

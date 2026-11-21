@@ -1,0 +1,225 @@
+# Recipe library UI for xiaomi_cooker_local (HA 2024.1+)
+#
+# 1. Add the `input_text:`, `input_number:` and `script:` sections below to
+#    configuration.yaml (or create the equivalent helpers/scripts in the UI).
+# 2. Replace SENSOR_ENTITY_ID and SELECT_ENTITY_ID in the card section with the
+#    entity IDs from your HA instance, then paste the card section into a dashboard.
+#
+# The recipe language selector is labelled with HA's real language name
+# (English/Deutsch/Français/...) and the original Chinese option.
+
+input_text:
+  cooker_recipe_query:
+    name: Recipe search
+    icon: mdi:magnify
+
+input_number:
+  cooker_recipe_id:
+    name: Recipe ID
+    icon: mdi:identifier
+    min: 1
+    max: 99999
+    step: 1
+    mode: box
+
+script:
+  cooker_search_recipes:
+    alias: Cooker - search recipes
+    sequence:
+      - service: xiaomi_cooker_local.search_recipes
+        data:
+          query: "{{ states('input_text.cooker_recipe_query') }}"
+          limit: 20
+
+  cooker_list_favorite_recipes:
+    alias: Cooker - list favorite recipes
+    sequence:
+      - service: xiaomi_cooker_local.list_favorites
+
+  cooker_load_recipe:
+    alias: Cooker - load recipe
+    sequence:
+      - service: xiaomi_cooker_local.get_recipe
+        data:
+          recipe: "{{ states('input_number.cooker_recipe_id') | int }}"
+
+  cooker_start_recipe:
+    alias: Cooker - start recipe
+    sequence:
+      - service: xiaomi_cooker_local.start_recipe
+        data:
+          recipe: "{{ states('input_number.cooker_recipe_id') | int }}"
+
+  cooker_save_recipe:
+    alias: Cooker - save recipe to favorites
+    sequence:
+      - service: xiaomi_cooker_local.add_favorite
+        data:
+          recipe: "{{ states('input_number.cooker_recipe_id') | int }}"
+
+  cooker_unsave_recipe:
+    alias: Cooker - remove recipe from favorites
+    sequence:
+      - service: xiaomi_cooker_local.remove_favorite
+        data:
+          recipe: "{{ states('input_number.cooker_recipe_id') | int }}"
+
+  cooker_refresh_recipes:
+    alias: Cooker - refresh recipes
+    sequence:
+      - service: xiaomi_cooker_local.refresh_recipes
+
+# ---------------------------------------------------------------------------
+# Paste from here into a dashboard. Replace the two entity IDs below.
+# ---------------------------------------------------------------------------
+type: vertical-stack
+cards:
+  - type: entities
+    title: Cooker control
+    entities:
+      - entity: select.REPLACE_WITH_COOK_MODE_SELECT
+      - entity: sensor.REPLACE_WITH_CURRENT_COOK_MODE_SENSOR
+      - entity: sensor.REPLACE_WITH_COOKER_STATUS_SENSOR
+      - entity: button.REPLACE_WITH_START_BUTTON
+
+  - type: entities
+    title: Recipe library
+    entities:
+      - entity: input_text.cooker_recipe_query
+      - entity: input_number.cooker_recipe_id
+      - entity: select.REPLACE_WITH_RECIPE_LANGUAGE_SELECT
+      - entity: sensor.REPLACE_WITH_RECIPE_LIBRARY_SENSOR
+      - entity: sensor.REPLACE_WITH_RECIPE_TRANSLATION_STATUS_SENSOR
+
+  - type: conditional
+    conditions:
+      - entity: sensor.REPLACE_WITH_RECIPE_TRANSLATION_STATUS_SENSOR
+        state_not: "OK"
+    card:
+      type: markdown
+      content: >-
+        ### Translation warning
+
+        {{ states('sensor.REPLACE_WITH_RECIPE_TRANSLATION_STATUS_SENSOR') }}
+
+        Recipe text will fall back to bundled English or the original Chinese.
+        Cooking control is unaffected.
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Search
+        icon: mdi:magnify
+        tap_action:
+          action: call-service
+          service: script.cooker_search_recipes
+      - type: button
+        name: Favorites
+        icon: mdi:heart
+        tap_action:
+          action: call-service
+          service: script.cooker_list_favorite_recipes
+      - type: button
+        name: Refresh recipes
+        icon: mdi:download
+        tap_action:
+          action: call-service
+          service: script.cooker_refresh_recipes
+
+  - type: markdown
+    title: Results
+    content: >-
+      {% set lib = 'sensor.REPLACE_WITH_RECIPE_LIBRARY_SENSOR' %}
+      {% set results = state_attr(lib, 'last_search') or [] %}
+      {% if results %}
+      **{{ state_attr(lib, 'last_query') or 'Recipes' }} — {{ results | length }} shown**
+
+      {% for recipe in results %}
+      **{{ recipe.id }} — {{ recipe.name }}**{% if recipe.duration %} · {{ recipe.duration }} min{% endif %}{% if recipe.favorite %} · ♥{% endif %}
+
+      {% endfor %}
+      {% else %}
+      *Search by Chinese name, English name or ingredient (for example 温泉蛋 or egg).*
+      {% endif %}
+
+  - type: markdown
+    title: Recipe
+    content: >-
+      {% set lib = 'sensor.REPLACE_WITH_RECIPE_LIBRARY_SENSOR' %}
+      {% set recipe = state_attr(lib, 'last_recipe') %}
+      {% if recipe %}
+      {% if recipe.cover_image %}
+      ![{{ recipe.name }}]({{ recipe.cover_image }})
+      {% endif %}
+
+      # {{ recipe.name }}
+
+      **ID {{ recipe.id }}**{% if recipe.duration %} · ⏱ {{ recipe.duration }} min{% endif %}{% if recipe.default_keep_warm %} · ♨ {{ recipe.default_keep_warm }} min keep warm{% endif %}{% if recipe.favorite %} · ♥ Favorite{% endif %}
+
+      {{ recipe.description or '' }}
+
+      ### Ingredients
+
+      {% for item in recipe.ingredients %}
+      - {{ item.name }}{% if item.quantity %} — {{ item.quantity }}{% endif %}
+      {% endfor %}
+
+      {% for food in recipe.foods %}
+      **{{ food.name }}**
+      {% for item in food.ingredients %}
+      - {{ item.name }}{% if item.quantity %} — {{ item.quantity }}{% endif %}
+      {% endfor %}
+      {% endfor %}
+
+      {% if recipe.tools %}
+      ### Tools
+
+      {% for item in recipe.tools %}
+      - {{ item.name }}
+      {% endfor %}
+      {% endif %}
+
+      ### Steps
+
+      {% for step in recipe.steps %}
+      {{ loop.index }}. {{ step.content }}
+      {% if step.image %}   ![step {{ loop.index }}]({{ step.image }}){% endif %}
+      {% endfor %}
+
+      {% if recipe.tips %}
+      ### Tips
+
+      {{ recipe.tips }}
+      {% endif %}
+      {% else %}
+      *Enter a recipe ID above and press* **Load recipe**.
+      {% endif %}
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Load recipe
+        icon: mdi:book-open
+        tap_action:
+          action: call-service
+          service: script.cooker_load_recipe
+      - type: button
+        name: Start recipe
+        icon: mdi:play
+        tap_action:
+          action: call-service
+          service: script.cooker_start_recipe
+          confirmation:
+            text: Start this recipe on the cooker?
+      - type: button
+        name: Save ♥
+        icon: mdi:heart-plus
+        tap_action:
+          action: call-service
+          service: script.cooker_save_recipe
+      - type: button
+        name: Remove ♥
+        icon: mdi:heart-off
+        tap_action:
+          action: call-service
+          service: script.cooker_unsave_recipe

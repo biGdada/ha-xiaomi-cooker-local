@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to your Xiaomi rice cooker",
+        "description": "Enter the cooker's IP address. Leave the token empty to import it from another Xiaomi integration using the same IP, or paste it manually. Leave model empty to auto-detect it. Known models: {known_models}",
+        "data": {
+          "host": "IP address",
+          "token": "miIO token (optional, auto-imported when left empty)",
+          "name": "Name",
+          "model": "Model (optional, auto-detected)",
+          "scan_interval": "Polling interval (seconds)",
+          "timeout": "Connection timeout (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect. Check the IP, token, and that the cooker is on the same network. If auto-detection fails, fill in the model field.",
+      "token_not_found": "No saved miIO token was found for that IP. Add the cooker to Xiaomi Miio/Xiaomi Miot Auto first, or paste its token manually.",
+      "invalid_profiles": "Invalid custom profiles JSON."
+    },
+    "abort": {
+      "already_configured": "This cooker is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cooker options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "timeout": "Connection timeout (seconds)",
+          "profiles": "Custom profiles (JSON list of title/profile objects)",
+          "recipe_source": "Recipe source",
+          "recipe_language": "Recipe language"
+        }
+      }
+    },
+    "error": {
+      "invalid_profiles": "Invalid custom profiles JSON."
+    }
+  },
+  "entity": {
+    "button": {
+      "refresh_recipes": {
+        "name": "Refresh recipes"
+      }
+    },
+    "number": {
+      "recipe_id": {
+        "name": "Recipe ID"
+      }
+    },
+    "text": {
+      "recipe_query": {
+        "name": "Recipe search query"
+      }
+    },
+    "select": {
+      "recipe_language": {
+        "name": "Recipe language"
+      }
+    },
+    "sensor": {
+      "recipe_library": {
+        "name": "Recipe library"
+      },
+      "recipe_translation_status": {
+        "name": "Recipe translation status"
+      }
+    }
+  }
+}
