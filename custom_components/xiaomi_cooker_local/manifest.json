@@ -2,6 +2,7 @@
   "domain": "xiaomi_cooker_local",
   "name": "Xiaomi Rice Cooker (Local miio)",
   "after_dependencies": ["http", "lovelace"],
+  "categories": ["appliances.kitchen"],
   "codeowners": ["@biGdada"],
   "config_flow": true,
   "documentation": "https://github.com/biGdada/ha-xiaomi-cooker-local",
