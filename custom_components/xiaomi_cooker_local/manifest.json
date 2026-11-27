@@ -8,7 +8,8 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/biGdada/ha-xiaomi-cooker-local/issues",
   "loggers": ["miio", "custom_components.xiaomi_cooker_local"],
-  "requirements": ["python-miio==0.5.12", "requests>=2.31.0"],
+  "after_dependencies": ["http", "lovelace"],
+  "requirements": ["python-miio>=0.5.12"],
   "version": "0.1.0",
   "zeroconf": ["_miio._udp.local."]
 }
