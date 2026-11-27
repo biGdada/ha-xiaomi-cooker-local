@@ -141,6 +141,11 @@ dump:
       selector:
         device:
           integration: xiaomi_cooker_local
+  response:
+    path:
+      description: Path of the written dump file.
+      example: /config/.storage/xiaomi_cooker_local_dump_abc_1700000000.json
+
 get_temperature_history:
   name: Get temperature history
   description: Return the decoded temperature history recorded during cooking.
@@ -150,6 +155,11 @@ get_temperature_history:
       selector:
         device:
           integration: xiaomi_cooker_local
+  response:
+    temperatures:
+      description: List of temperatures recorded during cooking.
+      example: "[22, 21, 21]"
+
 search_recipes:
   name: Search recipes
   description: Search the recipe library by name or ingredient, in Chinese or English.
@@ -177,6 +187,14 @@ search_recipes:
       default: false
       selector:
         boolean:
+  response:
+    recipes:
+      description: Matching recipes with localized names, images and favorite flags.
+    language:
+      description: Language code used for the localized names.
+    total:
+      description: Total number of recipes in the library.
+
 get_recipe:
   name: Get recipe details
   description: "Return the full recipe: image, ingredients, steps, tips and cookcode."
@@ -200,6 +218,16 @@ get_recipe:
           options:
             - ha
             - original
+  response:
+    id:
+      description: Recipe ID.
+    name:
+      description: Localized recipe name.
+    ingredients:
+      description: Localized ingredient list with quantities.
+    steps:
+      description: Localized cooking steps.
+
 start_recipe:
   name: Start recipe
   description: Start a cloud recipe locally on chunmi.cooker.normalcd1 using its runnable cookcode.
@@ -216,6 +244,12 @@ start_recipe:
       example: 温泉蛋
       selector:
         text:
+  response:
+    id:
+      description: Recipe ID that was started.
+    name:
+      description: Localized recipe name.
+
 translate_recipe:
   name: Translate a recipe
   description: Translate missing English text for one recipe using Google Translate and save it to the local translation and recipe caches so it remains in English after restart.
@@ -231,6 +265,18 @@ translate_recipe:
       required: true
       selector:
         text:
+  response:
+    id:
+      description: Recipe ID.
+    name:
+      description: Localized recipe name.
+    translated:
+      description: Number of strings translated.
+    failed:
+      description: Number of strings that could not be translated.
+    error:
+      description: First translation error, or null.
+
 add_favorite:
   name: Save recipe to favorites
   description: Save a recipe to the local favorites list in Home Assistant.
@@ -272,6 +318,10 @@ list_favorites:
       selector:
         device:
           integration: xiaomi_cooker_local
+  response:
+    recipes:
+      description: Favorite recipes with localized names and images.
+
 refresh_recipes:
   name: Refresh recipes
   description: Redownload recipes from the Joyami API and fall back to the bundled catalogue on failure.
@@ -281,3 +331,12 @@ refresh_recipes:
       selector:
         device:
           integration: xiaomi_cooker_local
+  response:
+    count:
+      description: Number of recipes available after the refresh.
+    last_refresh:
+      description: Timestamp of the successful refresh.
+    error:
+      description: Error message when the refresh failed, otherwise null.
+    translation_warning:
+      description: Message when translation was unavailable or rate-limited, otherwise null.
