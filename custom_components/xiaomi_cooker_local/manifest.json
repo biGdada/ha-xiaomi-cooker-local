@@ -1,6 +1,7 @@
 {
   "domain": "xiaomi_cooker_local",
   "name": "Xiaomi Rice Cooker (Local miio)",
+  "after_dependencies": ["http", "lovelace"],
   "codeowners": ["@biGdada"],
   "config_flow": true,
   "documentation": "https://github.com/biGdada/ha-xiaomi-cooker-local",
@@ -8,7 +9,6 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/biGdada/ha-xiaomi-cooker-local/issues",
   "loggers": ["miio", "custom_components.xiaomi_cooker_local"],
-  "after_dependencies": ["http", "lovelace"],
   "requirements": ["python-miio>=0.5.12"],
   "version": "0.1.0",
   "zeroconf": ["_miio._udp.local."]
